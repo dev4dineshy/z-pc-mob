@@ -1,15 +1,19 @@
 {
   "expo": {
-    "name": "z-pc-mob",
+    "name": "PeopleConnect",
     "slug": "z-pc-mob",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "peopleconnect",
+    "newArchEnabled": false,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.peopleconnect.app"
     },
     "android": {
+      "package": "com.peopleconnect.app",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -19,6 +23,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-secure-store",
+      "expo-video",
+      "expo-sharing"
+    ]
   }
 }
