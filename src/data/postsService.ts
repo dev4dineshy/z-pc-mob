@@ -3,10 +3,7 @@
  *
  * All post-related queries for the mobile app.
  *
- * Currently backed by local AppData (seedData / SecureStore).
- * When a web-portal API becomes available, replace the implementations
- * of getPublishedPosts / getPostById with HTTP calls while keeping
- * the same signatures — screens won't need any changes.
+ * Operates on the API-backed AppData loaded by the application context.
  *
  * Post visibility rules (mirrors the web admin portal):
  *   - Only posts with status === 'published' are shown.
@@ -15,21 +12,22 @@
  */
 
 import { AppData, Post, Channel, Candidate } from '../types';
+import { formatTimestamp, timestampToMilliseconds } from '../utils/date';
 
 // ─── Public post shape ────────────────────────────────────────────────────────
 
 /** Resolved post with denormalised owner and channel info */
 export interface ResolvedPost extends Post {
   ownerName: string;
-  ownerLabel: string;    // e.g. "Alex Sample · Region A"  or  "Sample Party"
-  platformLabels: string[];   // e.g. ["Facebook", "YouTube"]
+  ownerLabel: string;
+  platformLabels: string[];
   platforms: Array<'facebook' | 'youtube' | 'x'>;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function sortKey(p: Post): string {
-  return p.publishedAt ?? p.createdAt;
+function sortKey(p: Post): number {
+  return timestampToMilliseconds(p.publishedAt ?? p.createdAt);
 }
 
 function resolvePost(post: Post, data: AppData): ResolvedPost {
@@ -81,7 +79,7 @@ export function getPublishedPosts(
       if (regionId) return p.regionId === regionId;
       return false;   // no region set → skip region-specific posts
     })
-    .sort((a, b) => sortKey(b).localeCompare(sortKey(a)));
+    .sort((a, b) => sortKey(b) - sortKey(a));
 
   const paged = limit != null
     ? filtered.slice(offset, offset + limit)
@@ -101,12 +99,7 @@ export function getPublishedPost(
 
 /** Format a date string for display, e.g. "30 Sep 2026" */
 export function formatPostDate(dateStr: string): string {
-  try {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  } catch {
-    return dateStr;
-  }
+  return formatTimestamp(dateStr);
 }
 
 /** Human-readable post type label */

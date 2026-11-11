@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { colors, spacing, radius } from '../theme';
 import AppHeader from '../components/AppHeader';
 import { useApp } from '../AppContext';
+import { createComplaint } from '../data/dataService';
 
 const CATEGORIES = ['Street lighting', 'Roads', 'Waste management', 'Water supply', 'Parks', 'Other'];
 
@@ -19,14 +20,13 @@ export default function ComplaintsScreen({ navigation }: any) {
 
   const myComplaints: any[] = data.complaints || [];
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!category || !desc.trim()) return;
-    const ref = `CMP-2026-${String(myComplaints.length + 1).padStart(4, '0')}`;
-    const c = { id: 'comp' + Date.now(), ref, category, location, description: desc, status: 'Received', date: new Date().toISOString().split('T')[0] };
-    const updated = { ...data, complaints: [...data.complaints, c] };
-    setData(updated);
-    setSubmitted(c);
-    setCategory(''); setLocation(''); setDesc(''); setAgreed(false);
+    try {
+      const complaint = await createComplaint({ category, location, description: desc.trim() });
+      setData({ ...data, complaints: [...data.complaints, complaint] }); setSubmitted(complaint);
+      setCategory(''); setLocation(''); setDesc(''); setAgreed(false);
+    } catch (error) { Alert.alert('Submission failed', error instanceof Error ? error.message : 'Please try again.'); }
   }
 
   if (submitted) return (
@@ -63,7 +63,6 @@ export default function ComplaintsScreen({ navigation }: any) {
             <Text style={s.summaryLoc}>{submitted.location || 'Location not provided'}</Text>
           </View>
         </View>
-        <Text style={s.sampleNote}>Sample status flow.</Text>
         <TouchableOpacity style={s.successBackBtn} onPress={() => setSubmitted(null)}>
           <MaterialIcons name="arrow-back" size={16} color={colors.white} />
           <Text style={s.backBtnTxt}>Back to my complaints</Text>
@@ -103,7 +102,7 @@ export default function ComplaintsScreen({ navigation }: any) {
             </View>
             <View style={s.formGroup}>
               <Text style={s.label}>Location</Text>
-              <View style={s.inputRow}><Ionicons name="location-outline" size={16} color={colors.textMuted} style={s.inputIco} /><TextInput style={s.input} value={location} onChangeText={setLocation} placeholder="Ward 05, Sample Street" placeholderTextColor={colors.textMuted} /></View>
+              <View style={s.inputRow}><Ionicons name="location-outline" size={16} color={colors.textMuted} style={s.inputIco} /><TextInput style={s.input} value={location} onChangeText={setLocation} placeholder="Enter location or ward" placeholderTextColor={colors.textMuted} /></View>
             </View>
             <View style={s.formGroup}>
               <Text style={s.label}>Description</Text>
@@ -199,7 +198,6 @@ const s = StyleSheet.create({
   timelineInactive: { fontSize: 13, color: colors.textMuted },
   summaryLocRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
   summaryLoc: { fontSize: 13, color: colors.textMuted },
-  sampleNote: { fontSize: 12, color: colors.textMuted, marginTop: spacing.sm },
   successBackBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.teal, borderRadius: radius.md, paddingVertical: 12, paddingHorizontal: spacing.xl, marginTop: spacing.lg },
   backBtnTxt: { color: colors.white, fontWeight: '700', fontSize: 14 },
 });

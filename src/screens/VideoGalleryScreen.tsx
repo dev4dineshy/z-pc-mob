@@ -85,7 +85,7 @@ function VideoCard({
 // ─── Screen ───────────────────────────────────────────────────────────────────
 export default function VideoGalleryScreen({ navigation }: any) {
   const { data } = useApp();
-  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh();
+  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh(['videos']);
   const [tab, setTab] = useState('All');
   const videos: any[] = (data as any).videos || [];
   const filtered = tab === 'All'

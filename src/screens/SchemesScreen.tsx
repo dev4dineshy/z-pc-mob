@@ -12,7 +12,7 @@ const CATS = ['All', 'Education', 'Housing', 'Health'];
 
 export default function SchemesScreen({ navigation }: any): React.JSX.Element {
   const { data } = useApp();
-  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh();
+  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh(['schemes']);
   const [filter, setFilter] = useState('All');
   const [query, setQuery] = useState('');
 
@@ -54,7 +54,7 @@ export default function SchemesScreen({ navigation }: any): React.JSX.Element {
                 </View>
                 <View style={s.cardBody}>
                   <Text style={s.cardTitle}>{sc.title}</Text>
-                  <Text style={s.cardProg}>{sc.programme || 'Sample programme'}</Text>
+                  {sc.programme ? <Text style={s.cardProg}>{sc.programme}</Text> : null}
                   <Text style={s.cardDesc} numberOfLines={2}>{sc.description}</Text>
                 </View>
               </View>
@@ -70,10 +70,6 @@ export default function SchemesScreen({ navigation }: any): React.JSX.Element {
             </View>
           )}
 
-          <View style={s.noteBox}>
-            <MaterialIcons name="info-outline" size={14} color="#92400E" />
-            <Text style={s.noteTxt}>Illustrative schemes only.</Text>
-          </View>
         </View>
       </RefreshableScrollView>
     </SafeAreaView>
@@ -102,6 +98,4 @@ const s = StyleSheet.create({
   eligTxt: { color: colors.teal, fontSize: 13, fontWeight: '600' },
   empty: { paddingVertical: spacing.xl, alignItems: 'center' },
   emptyTxt: { color: colors.textMuted, fontSize: 14 },
-  noteBox: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#FEF9C3', borderRadius: radius.sm, padding: spacing.sm, marginTop: spacing.md },
-  noteTxt: { fontSize: 12, color: '#92400E', flex: 1 },
 });

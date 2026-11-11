@@ -22,7 +22,7 @@ const TABS = ['All', 'Community', 'Events'];
 
 export default function NewsScreen({ navigation }: any) {
   const { data } = useApp();
-  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh();
+  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh(['news']);
   const [tab, setTab] = useState('All');
   const news: any[] = (data as any).news || [];
   const filtered = tab === 'All' ? news : news.filter((n: any) => n.category === tab);

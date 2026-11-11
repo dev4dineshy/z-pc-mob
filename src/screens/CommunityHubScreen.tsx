@@ -7,6 +7,7 @@ import { useApp } from '../AppContext';
 import AppHeader from '../components/AppHeader';
 import RefreshableScrollView from '../components/RefreshableScrollView';
 import { useRefresh } from '../hooks/useRefresh';
+import { formatTimestamp, timestampToMilliseconds } from '../utils/date';
 
 const TABS = ['All', 'Updates', 'Surveys'];
 const SORTS = ['Latest first', 'Oldest first'];
@@ -21,7 +22,7 @@ const POST_THUMBS = [
 
 export default function CommunityHubScreen({ navigation }: any) {
   const { data } = useApp();
-  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh();
+  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh(['posts', 'candidates', 'regions', 'channels', 'party']);
   const [tab, setTab] = useState('All');
   const [sort, setSort] = useState('Latest first');
 
@@ -34,8 +35,8 @@ export default function CommunityHubScreen({ navigation }: any) {
 
   const sorted = [...posts].sort((a: any, b: any) =>
     sort === 'Latest first'
-      ? new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      : new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      ? timestampToMilliseconds(b.createdAt) - timestampToMilliseconds(a.createdAt)
+      : timestampToMilliseconds(a.createdAt) - timestampToMilliseconds(b.createdAt)
   );
 
   function cycleSort() {
@@ -80,12 +81,12 @@ export default function CommunityHubScreen({ navigation }: any) {
                 </View>
                 <Text style={s.cardTitle}>{p.title}</Text>
                 <Text style={s.cardAuthor}>Published by {p.ownerType === 'party' ? 'admin' : 'candidate'}</Text>
-                <Text style={s.cardDate}>{p.createdAt}</Text>
+                <Text style={s.cardDate}>{formatTimestamp(p.createdAt)}</Text>
                 <Text style={s.cardDesc} numberOfLines={2}>{p.body}</Text>
                 {p.type === 'survey' ? (
                   <View style={s.surveyNote}>
                     <MaterialIcons name="info-outline" size={13} color="#92400E" />
-                    <Text style={s.surveyNoteTxt}>Survey demo — responses not collected in this preview.</Text>
+                    <Text style={s.surveyNoteTxt}>Survey responses are not available yet.</Text>
                   </View>
                 ) : (
                   <View style={s.cardActions}>

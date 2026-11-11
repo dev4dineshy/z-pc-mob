@@ -20,7 +20,7 @@ const ACTIVITY_ICONS = [
 
 export default function HealthScreen({ navigation }: any) {
   const { data } = useApp();
-  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh();
+  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh(['health']);
   const health: any = (data as any).health || {};
 
   return (

@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, radius } from '../theme';
 import AppHeader from '../components/AppHeader';
 import { useApp } from '../AppContext';
+import { createFeedback } from '../data/dataService';
 
 const TOPICS = ['App experience', 'Content', 'Services', 'General'];
 
@@ -16,12 +17,12 @@ export default function FeedbackScreen({ navigation }: any) {
   const [name, setName] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
-  function handleSubmit() {
+  async function handleSubmit() {
     if (!rating || !text.trim()) return;
-    const f = { id: 'fb' + Date.now(), rating, topic, text, name, date: new Date().toISOString().split('T')[0] };
-    const updated = { ...data, feedback: [...data.feedback, f] };
-    setData(updated);
-    setSubmitted(true);
+    try {
+      const feedback = await createFeedback({ rating, topic, text: text.trim(), name: name.trim() });
+      setData({ ...data, feedback: [...data.feedback, feedback] }); setSubmitted(true);
+    } catch (error) { Alert.alert('Submission failed', error instanceof Error ? error.message : 'Please try again.'); }
   }
 
   if (submitted) return (
@@ -82,7 +83,7 @@ export default function FeedbackScreen({ navigation }: any) {
 
           <View style={s.formGroup}>
             <Text style={s.label}>Name (optional)</Text>
-            <TextInput style={s.input} value={name} onChangeText={setName} placeholder="Sample User" placeholderTextColor={colors.textMuted} />
+            <TextInput style={s.input} value={name} onChangeText={setName} placeholder="Your name" placeholderTextColor={colors.textMuted} />
           </View>
 
           <TouchableOpacity style={[s.submitBtn, (!rating || !text) && s.submitBtnDisabled]} onPress={handleSubmit} disabled={!rating || !text}>

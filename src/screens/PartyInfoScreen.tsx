@@ -93,7 +93,7 @@ const r = StyleSheet.create({
 // ─── Screen ───────────────────────────────────────────────────────────────────
 export default function PartyInfoScreen({ navigation }: any): React.JSX.Element {
   const { data } = useApp();
-  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh();
+  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh(['party', 'channels']);
   const party = data.party;
 
   // Party-owned channels only

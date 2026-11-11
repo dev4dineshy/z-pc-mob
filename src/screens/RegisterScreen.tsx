@@ -8,6 +8,8 @@ import { useApp } from '../AppContext';
 import AppHeader from '../components/AppHeader';
 
 const REG_BANNER = require('../../assets/images/banners/registration-community-banner.png');
+const STRONG_PASSWORD = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,128}$/;
+const PASSWORD_MESSAGE = 'Password must be 8 to 128 characters and contain uppercase, lowercase, and a number';
 
 export default function RegisterScreen({ navigation }: any): React.JSX.Element {
   const { data, setData, setSession } = useApp();
@@ -24,14 +26,13 @@ export default function RegisterScreen({ navigation }: any): React.JSX.Element {
     setError('');
     if (!name.trim())                         return setError('Full name is required');
     if (!email.trim() || !email.includes('@')) return setError('Valid email is required');
-    if (password.length < 6)                  return setError('Password must be at least 6 characters');
+    if (!STRONG_PASSWORD.test(password))      return setError(PASSWORD_MESSAGE);
     if (password !== confirm)                 return setError('Passwords do not match');
     setLoading(true);
     const result = await registerUser(name.trim(), email.trim().toLowerCase(), password, data);
     setLoading(false);
     if (result.error) return setError(result.error);
     if (result.account) {
-      setData({ ...data });
       await setSession(result.account);
       navigation.reset({ index: 0, routes: [{ name: 'Selection' }] });
     }
@@ -58,14 +59,14 @@ export default function RegisterScreen({ navigation }: any): React.JSX.Element {
             <Text style={s.label}>Full name</Text>
             <View style={s.inputRow}>
               <MaterialIcons name="person-outline" size={18} color={colors.textMuted} style={s.ico} />
-              <TextInput style={s.input} value={name} onChangeText={setName} placeholder="Alex Sample" placeholderTextColor={colors.textMuted} />
+              <TextInput style={s.input} value={name} onChangeText={setName} placeholder="Your full name" placeholderTextColor={colors.textMuted} />
             </View>
 
             {/* Email */}
             <Text style={s.label}>Email address</Text>
             <View style={s.inputRow}>
               <MaterialIcons name="email" size={18} color={colors.textMuted} style={s.ico} />
-              <TextInput style={s.input} value={email} onChangeText={setEmail} placeholder="alex@example.com" keyboardType="email-address" autoCapitalize="none" placeholderTextColor={colors.textMuted} />
+              <TextInput style={s.input} value={email} onChangeText={setEmail} placeholder="you@example.com" keyboardType="email-address" autoCapitalize="none" placeholderTextColor={colors.textMuted} />
             </View>
 
             {/* Password */}
@@ -77,6 +78,7 @@ export default function RegisterScreen({ navigation }: any): React.JSX.Element {
                 <MaterialIcons name={showPass ? 'visibility-off' : 'visibility'} size={20} color={colors.textMuted} />
               </TouchableOpacity>
             </View>
+            <Text style={s.passwordHint}>{PASSWORD_MESSAGE}.</Text>
 
             {/* Confirm password */}
             <Text style={s.label}>Confirm password</Text>
@@ -117,6 +119,7 @@ const s = StyleSheet.create({
   inputRow:   { flexDirection: 'row', alignItems: 'center', borderWidth: 1.5, borderColor: colors.border, borderRadius: radius.md, paddingHorizontal: spacing.sm, backgroundColor: colors.background, marginBottom: 4 },
   ico:        { marginRight: 8 },
   input:      { flex: 1, paddingVertical: 13, fontSize: 15, color: colors.navy },
+  passwordHint: { color: colors.textMuted, fontSize: 12, lineHeight: 17, marginTop: 2 },
   btn:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.teal, borderRadius: radius.md, paddingVertical: 15, marginTop: spacing.lg, marginBottom: spacing.md },
   btnText:    { color: colors.white, fontWeight: '800', fontSize: 16 },
   bottomRow:  { flexDirection: 'row', justifyContent: 'center', marginBottom: spacing.sm },

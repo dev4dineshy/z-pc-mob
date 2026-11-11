@@ -10,7 +10,7 @@ import AppHeader from '../components/AppHeader';
 const LOGIN_BANNER = require('../../assets/images/banners/login-community-banner.png');
 
 export default function LoginScreen({ navigation }: any): React.JSX.Element {
-  const { data, setSession } = useApp();
+  const { setSession } = useApp();
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
   const [showPass, setShowPass] = useState(false);
@@ -22,11 +22,13 @@ export default function LoginScreen({ navigation }: any): React.JSX.Element {
     if (!email.trim()) return setError('Email is required');
     if (!password)     return setError('Password is required');
     setLoading(true);
-    const acc = await loginUser(email.trim().toLowerCase(), password, data);
-    setLoading(false);
-    if (!acc) return setError('Invalid email or password');
-    await setSession(acc);
-    navigation.reset({ index: 0, routes: [{ name: 'Selection' }] });
+    try {
+      const acc = await loginUser(email.trim().toLowerCase(), password);
+      if (!acc) return setError('Invalid email or password');
+      await setSession(acc);
+      navigation.reset({ index: 0, routes: [{ name: 'Selection' }] });
+    } catch (err) { setError(err instanceof Error ? err.message : 'Unable to connect to the server.'); }
+    finally { setLoading(false); }
   }
 
   return (
@@ -53,7 +55,7 @@ export default function LoginScreen({ navigation }: any): React.JSX.Element {
                 style={s.input}
                 value={email}
                 onChangeText={setEmail}
-                placeholder="alex@example.com"
+                placeholder="you@example.com"
                 keyboardType="email-address"
                 autoCapitalize="none"
                 placeholderTextColor={colors.textMuted}
@@ -100,9 +102,6 @@ export default function LoginScreen({ navigation }: any): React.JSX.Element {
               <Text style={s.backBtnTxt}>Back to public view</Text>
             </TouchableOpacity>
 
-            <View style={s.hintBox}>
-              <Text style={s.hintTxt}>Try: user@example.com / user123</Text>
-            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>

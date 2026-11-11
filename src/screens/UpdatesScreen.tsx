@@ -5,9 +5,11 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { colors, spacing, radius } from '../theme';
 import { getNotificationsForUser } from '../data/dataService';
 import { useApp } from '../AppContext';
+import { markNotificationRead } from '../data/dataService';
 import AppHeader from '../components/AppHeader';
 import RefreshableScrollView from '../components/RefreshableScrollView';
 import { useRefresh } from '../hooks/useRefresh';
+import { formatTimestamp } from '../utils/date';
 
 const W = Dimensions.get('window').width;
 
@@ -46,17 +48,7 @@ function detectPlatform(url?: string | null): Platform | null {
 
 // ─── Time-ago helper ──────────────────────────────────────────────────────────
 function timeAgo(dateStr: string): string {
-  // Since these are future demo dates, show a relative label based on ordering
-  const labels: Record<string, string> = {
-    '2026-10-01': '2 days ago',
-    '2026-09-30': '3 days ago',
-    '2026-09-29': '4 days ago',
-    '2026-09-28': '5 days ago',
-    '2026-09-27': '6 days ago',
-    '2026-09-25': '1 week ago',
-    '2026-09-22': '2 weeks ago',
-  };
-  return labels[dateStr] ?? dateStr;
+  return formatTimestamp(dateStr);
 }
 
 // ─── Resolve navigation on tap ────────────────────────────────────────────────
@@ -116,12 +108,13 @@ const pb = StyleSheet.create({
 // ─── Screen ───────────────────────────────────────────────────────────────────
 export default function UpdatesScreen({ navigation }: any): React.JSX.Element {
   const { data, setData, session } = useApp();
-  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh();
+  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh(['notifications', 'posts', 'candidates', 'party', 'regions']);
   const account = session;
   const region  = data.regions.find((r: any) => r.id === account?.regionId);
   const notifications = account ? getNotificationsForUser(account, data) : [];
 
-  function markRead(nId: string) {
+  async function markRead(nId: string) {
+    await markNotificationRead(nId);
     const updated = {
       ...data,
       notifications: data.notifications.map((x: any) =>
@@ -132,7 +125,7 @@ export default function UpdatesScreen({ navigation }: any): React.JSX.Element {
   }
 
   async function handlePress(n: any) {
-    markRead(n.id);
+    await markRead(n.id);
     await resolveAction(n, data, navigation);
   }
 

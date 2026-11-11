@@ -18,7 +18,7 @@ const DEV_THUMBS = [
 
 export default function DevelopmentScreen({ navigation }: any) {
   const { data } = useApp();
-  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh();
+  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh(['development']);
   const [status, setStatus] = useState<'Ongoing' | 'Completed'>('Ongoing');
   const dev: any[] = (data as any).development || [];
   const filtered = dev.filter((d: any) => d.status === status);

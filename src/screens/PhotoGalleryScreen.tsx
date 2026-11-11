@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, Modal, Image, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons } from '@expo/vector-icons';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import * as Sharing from 'expo-sharing';
 import { colors, spacing, radius } from '../theme';
 import AppHeader from '../components/AppHeader';
@@ -27,7 +27,7 @@ const GALLERY_IMGS = [
 
 export default function PhotoGalleryScreen({ navigation }: any) {
   const { data } = useApp();
-  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh();
+  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh(['gallery']);
   const [tab, setTab] = useState('All');
   const [selected, setSelected] = useState<any>(null);
   const [downloading, setDownloading] = useState(false);

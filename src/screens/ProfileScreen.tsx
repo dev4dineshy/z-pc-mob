@@ -3,12 +3,11 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Alert } from 'rea
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { colors, spacing, radius } from '../theme';
-import { resetData } from '../data/dataService';
 import { useApp } from '../AppContext';
 import AppHeader from '../components/AppHeader';
 
 export default function ProfileScreen({ navigation }: any): React.JSX.Element {
-  const { data, setData, session, logout } = useApp();
+  const { data, session, logout } = useApp();
   const account = session;
   const region    = data.regions.find((r: any) => r.id === account?.regionId);
   const candidate = data.candidates.find((c: any) => c.id === account?.candidateId);
@@ -17,19 +16,6 @@ export default function ProfileScreen({ navigation }: any): React.JSX.Element {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
       { text: 'Cancel', style: 'cancel' },
       { text: 'Logout', style: 'destructive', onPress: logout }
-    ]);
-  }
-
-  function handleReset() {
-    Alert.alert('Reset Demo Data', 'This will restore all seed data. Continue?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Reset', style: 'destructive', onPress: async () => {
-          const fresh = await resetData();
-          setData(fresh);
-          Alert.alert('Done', 'Demo data has been reset.');
-        }
-      }
     ]);
   }
 
@@ -80,14 +66,6 @@ export default function ProfileScreen({ navigation }: any): React.JSX.Element {
               <Text style={s.rowVal}>Registered User</Text>
             </View>
           </View>
-        </View>
-
-        <View style={s.card}>
-          <Text style={s.cardTitle}>Demo Controls</Text>
-          <TouchableOpacity style={s.resetBtn} onPress={handleReset}>
-            <MaterialIcons name="refresh" size={16} color={colors.teal} />
-            <Text style={s.resetBtnTxt}>Reset Demo Data</Text>
-          </TouchableOpacity>
         </View>
 
         <TouchableOpacity style={s.logoutBtn} onPress={handleLogout}>

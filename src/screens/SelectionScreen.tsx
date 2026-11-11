@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { colors, spacing, radius } from '../theme';
@@ -27,11 +27,12 @@ export default function SelectionScreen({ navigation }: any): React.JSX.Element 
   async function handleSave() {
     if (!selectedRegion || !selectedCandidate || !account) return;
     setSaving(true);
-    await saveRegionCandidate(account.id, selectedRegion, selectedCandidate, data);
-    const updated = { ...account, regionId: selectedRegion, candidateId: selectedCandidate };
-    await setSession(updated);
-    setSaving(false);
-    navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+    try {
+      const updated = await saveRegionCandidate(account.id, selectedRegion, selectedCandidate, data);
+      await setSession(updated);
+      navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+    } catch (error) { Alert.alert('Unable to save', error instanceof Error ? error.message : 'Please try again.'); }
+    finally { setSaving(false); }
   }
 
   const selRegion = regions.find((r: any) => r.id === selectedRegion);

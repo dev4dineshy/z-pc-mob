@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useCallback } from 'react';
+import { createNavigationContainerRef, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { View, Text, ActivityIndicator, StyleSheet, LogBox } from 'react-native';
@@ -14,6 +14,7 @@ LogBox.ignoreLogs([
 ]);
 
 import { AppProvider, useApp } from './src/AppContext';
+import { DataResource } from './src/data/dataService';
 import { colors } from './src/theme';
 
 // Auth / selection screens
@@ -53,6 +54,39 @@ import VideoPlayerScreen        from './src/screens/VideoPlayerScreen';
 
 const Stack = createNativeStackNavigator() as any;
 const Tab   = createBottomTabNavigator() as any;
+const navigationRef = createNavigationContainerRef<any>();
+
+const ROUTE_RESOURCES: Record<string, DataResource[]> = {
+  GuestHome: ['party', 'schemes'],
+  Login: [],
+  Register: [],
+  Selection: ['regions', 'candidates'],
+  Home: ['party', 'regions', 'candidates', 'channels', 'posts'],
+  Updates: ['notifications', 'posts', 'candidates', 'party', 'regions'],
+  Profile: ['regions', 'candidates'],
+  PartyInfo: ['party', 'channels'],
+  Manifesto: ['manifesto_items'],
+  ManifestoDetail: ['manifesto_items'],
+  CommunityHub: ['party', 'regions', 'candidates', 'channels', 'posts'],
+  News: ['news'],
+  NewsArticle: ['news'],
+  Photos: ['gallery'],
+  Videos: ['videos'],
+  VideoPlayer: ['videos'],
+  Development: ['development'],
+  DevelopmentDetail: ['development'],
+  Health: ['health'],
+  HealthActivity: ['health'],
+  Schemes: ['schemes'],
+  SchemeDetail: ['schemes'],
+  PhoneNumbers: ['phoneNumbers'],
+  Complaints: ['complaints'],
+  Feedback: [],
+  Contact: ['contact'],
+  About: ['party', 'contact'],
+  Posts: ['party', 'regions', 'candidates', 'channels', 'posts'],
+  PostDetail: ['party', 'candidates', 'channels', 'posts'],
+};
 
 type TabName = 'Home' | 'Updates' | 'Profile';
 const TAB_ICON_NAME: Record<TabName, string> = {
@@ -161,11 +195,29 @@ export default function App() {
   return (
     <SafeAreaProvider>
       <AppProvider>
-        <NavigationContainer>
-          <RootNavigator />
-        </NavigationContainer>
+        <ApiNavigation />
       </AppProvider>
     </SafeAreaProvider>
+  );
+}
+
+function ApiNavigation() {
+  const { requestResources } = useApp();
+  const requestCurrentRoute = useCallback(() => {
+    const routeName = navigationRef.getCurrentRoute()?.name;
+    if (!routeName) return;
+    const resources = ROUTE_RESOURCES[routeName] ?? [];
+    if (resources.length) void requestResources(resources);
+  }, [requestResources]);
+
+  return (
+    <NavigationContainer
+      ref={navigationRef}
+      onReady={requestCurrentRoute}
+      onStateChange={requestCurrentRoute}
+    >
+      <RootNavigator />
+    </NavigationContainer>
   );
 }
 

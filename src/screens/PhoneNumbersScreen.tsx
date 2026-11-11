@@ -12,7 +12,7 @@ const CATS = ['All', 'Emergency', 'Local'];
 
 export default function PhoneNumbersScreen({ navigation }: any) {
   const { data } = useApp();
-  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh();
+  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh(['phoneNumbers']);
   const [cat, setCat] = useState('All');
   const numbers: any[] = (data as any).phoneNumbers || [];
   const filtered = cat === 'All' ? numbers : numbers.filter((n: any) => n.category === cat);
@@ -56,10 +56,6 @@ export default function PhoneNumbersScreen({ navigation }: any) {
               </TouchableOpacity>
             </View>
           ))}
-          <View style={s.warnBox}>
-            <MaterialIcons name="warning-amber" size={14} color="#DC2626" />
-            <Text style={s.warnTxt}>Demo numbers. Not for real calls.</Text>
-          </View>
         </View>
       </RefreshableScrollView>
     </SafeAreaView>
@@ -83,6 +79,4 @@ const s = StyleSheet.create({
   cardTitle: { fontSize: 14, fontWeight: '700', color: colors.navy },
   cardNum: { fontSize: 13, color: colors.textMuted },
   callBtn: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.tealLight, justifyContent: 'center', alignItems: 'center' },
-  warnBox: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, backgroundColor: '#FEE2E2', borderRadius: radius.sm, padding: spacing.sm, marginTop: spacing.sm },
-  warnTxt: { color: '#DC2626', fontSize: 12 },
 });

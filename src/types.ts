@@ -1,6 +1,6 @@
 export interface Region { id: string; name: string; }
 export interface Candidate { id: string; name: string; regionId: string; email: string; bio: string; photoUrl: string | null; }
-export interface Account { id: string; role: 'admin' | 'candidate' | 'user'; name: string; email: string; password: string; candidateId?: string; regionId?: string | null; }
+export interface Account { id: string; role: 'admin' | 'candidate' | 'user'; name: string; email: string; candidateId?: string; regionId?: string | null; }
 export interface Channel { id: string; ownerType: 'party' | 'candidate'; ownerId: string; platform: 'facebook' | 'youtube' | 'x'; label: string; connected: boolean; }
 export interface Post {
   id: string;
@@ -16,9 +16,9 @@ export interface Post {
   /** Direct URL to the original social-media post, if synced */
   originalPostUrl?: string | null;
   metrics: { likes: number; comments: number; reshares: number };
-  /** ISO date string — primary sort key */
+  /** Epoch-millisecond string — primary sort key */
   createdAt: string;
-  /** ISO date string when admin pressed Publish (may differ from createdAt) */
+  /** Epoch-millisecond string when admin pressed Publish */
   publishedAt?: string | null;
   /** Post category / type  */
   type?: 'update' | 'survey' | 'event' | 'announcement';
@@ -27,15 +27,21 @@ export interface Post {
   /** Free-form tags */
   tags?: string[];
 }
-export interface Scheme { id: string; title: string; description: string; regionId?: string | null; candidateId?: string | null; }
+export interface Scheme { id: string; title: string; description: string; category?: string; icon?: string; programme?: string; regionId?: string | null; candidateId?: string | null; }
 export interface Notification { id: string; regionId: string | null; candidateId: string | null; postId: string; title: string; body?: string; read: boolean; createdAt: string; }
 export interface Event { id: string; candidateId: string | null; regionId: string | null; title: string; date: string; description?: string; }
 export interface Campaign { id: string; title: string; candidateId: string | null; regionId: string | null; body: string; status: string; createdAt: string; }
 export interface Survey { id: string; title: string; candidateId: string | null; regionId: string | null; questions: string[]; responses: number; createdAt: string; }
 export interface GalleryItem { id: string; title: string; regionId: string | null; candidateId: string | null; mediaUrls: string[]; createdAt: string; }
 export interface VideoItem { id: string; title: string; regionId: string | null; candidateId: string | null; url: string | null; createdAt: string; }
+export interface NewsItem { id: string; title: string; body: string; date: string; category: string; imageEmoji?: string; }
+export interface DevelopmentItem { id: string; title: string; ward: string; progress: number; status: string; description: string; imageEmoji?: string; }
+export interface HealthSection { name: string; tagline: string; description: string; activities: any[]; links: any[]; }
+export interface PhoneNumber { id: string; title: string; number: string; category: string; icon?: string; }
+export interface ContactInfo { address: string; mapCoords?: { lat: number; lng: number }; mapLabel?: string; phone: string; email: string; hours: string; }
+export interface ManifestoItem { id: string; title: string; description: string; category?: string; icon?: string; }
 export interface AppData {
-  meta: { demo: boolean; description: string };
+  meta: { description: string };
   party: { id: string; name: string; about: string; manifesto: string[] };
   regions: Region[];
   candidates: Candidate[];
@@ -49,6 +55,12 @@ export interface AppData {
   surveys: Survey[];
   gallery: GalleryItem[];
   videos: VideoItem[];
+  news?: NewsItem[];
+  development?: DevelopmentItem[];
+  health?: HealthSection;
+  phoneNumbers?: PhoneNumber[];
+  contact?: ContactInfo;
+  manifesto_items?: ManifestoItem[];
   complaints: any[];
   feedback: any[];
 }

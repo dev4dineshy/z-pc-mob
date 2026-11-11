@@ -46,7 +46,7 @@ const CAROUSEL_H_TEXT   = 150;  // card text-only (no image)
 const HOME_BANNER    = require('../../assets/images/banners/home-community-banner.png');
 const PC_LOGO        = require('../../assets/images/logos/connected-people-symbol.png');
 
-// Map asset keys (used in seedData imageUrl) to local require() sources
+// Map API asset keys to bundled image sources.
 const POST_ASSET_MAP: Record<string, any> = {
   'health-camp':  require('../../assets/images/thumbnails/health-clinic.png'),
   'park-cleanup': require('../../assets/images/thumbnails/park-cleanup.png'),
@@ -94,14 +94,11 @@ const GRID: ServiceItem[] = [
 // ─── Component ───────────────────────────────────────────────────────────────
 export default function HomeScreen({ navigation }: any): React.JSX.Element {
   const { data, session } = useApp();
-  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh();
+  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh(['party', 'regions', 'candidates', 'channels', 'posts']);
   const account = session;
   const region  = data.regions?.find((r: any) => r.id === account?.regionId);
 
-  // Safe display name: never show "demo" or "client"
-  const rawFirst = account?.name?.split(' ')[0] ?? '';
-  const safeFirst = rawFirst && !['demo', 'client'].includes(rawFirst.toLowerCase());
-  const displayName = safeFirst ? account?.name ?? '' : '';
+  const displayName = account?.name ?? '';
 
   // Latest 3 published posts for the carousel
   const latestPosts = getPublishedPosts(data, { regionId: account?.regionId, limit: 3 });

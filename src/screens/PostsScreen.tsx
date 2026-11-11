@@ -88,7 +88,7 @@ function PostCard({ post, onPress }: { post: ResolvedPost; onPress: () => void }
 // ─── Screen ───────────────────────────────────────────────────────────────────
 export default function PostsScreen({ navigation }: any) {
   const { data, session } = useApp();
-  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh();
+  const { refreshing, onRefresh, errorMsg, clearError } = useRefresh(['party', 'regions', 'candidates', 'channels', 'posts']);
   const regionId = session?.regionId;
 
   const [typeFilter,   setTypeFilter]   = useState<string>('All');
